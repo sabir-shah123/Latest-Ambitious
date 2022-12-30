@@ -37,7 +37,7 @@ class BannerController extends Controller
      */
     public function store(Request $request)
     {
-       
+
         $this->validate($request, [
             'title' => 'string|required|max:50',
             'description' => 'string|nullable',
@@ -45,7 +45,7 @@ class BannerController extends Controller
             'status' => 'required|in:active,inactive',
         ]);
 
-       
+
 
         // $data=$request->all();
         $slug = Str::slug($request->title);
@@ -113,13 +113,13 @@ class BannerController extends Controller
 
         $banner->title = $request->title;
         $banner->description = $request->description;
-        if($request->photo){
-            
+        if ($request->photo) {
+
             $banner->photo = uploadFile($request->photo, 'Uploads/Banners', $request->title . '-' . time());
         }
         $banner->status = $request->status;
         $banner->save();
-        
+
         if ($banner) {
             request()->session()->flash('success', 'Banner successfully updated');
         } else {
@@ -144,7 +144,7 @@ class BannerController extends Controller
             request()->session()->flash('error', 'Error occurred while deleting banner');
         }
 
-        
+
         return redirect()->route('banner.index');
     }
 }

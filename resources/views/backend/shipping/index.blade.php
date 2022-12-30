@@ -43,7 +43,7 @@
                                     <td>{{ $shipping->id }}</td>
                                     <td>{{ $shipping->type ?? '' }}</td>
                                     <td>${{ $shipping->price ?? 0 }}</td>
-                                    <td>${{ $shipping->estimate_time ?? '' }}</td>
+                                    <td>{{ $shipping->estimate_time ?? '' }}</td>
                                     <td>
                                         @if ($shipping->status == 'active')
                                             <span class="badge badge-success">{{ $shipping->status }}</span>
