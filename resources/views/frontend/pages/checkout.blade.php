@@ -8,7 +8,6 @@
 @section('main-content')
 
 
-
     @php
         $user = auth()->user();
     @endphp
@@ -140,7 +139,8 @@
                                 <div class="content">
                                     <ul>
                                         <li class="order_subtotal" data-price="{{ Helper::totalCartPrice() }}">Cart
-                                            Subtotal<span>${{ number_format(Helper::totalCartPrice(), 2) }}</span></li>
+                                            Subtotal<span>{{ convertCurrency(number_format(Helper::totalCartPrice(), 2)) }}</span>
+                                        </li>
                                         <li class="shipping">
                                             Selecte Shipping Method
                                             @if (count(Helper::shipping()) > 0 && Helper::cartCount() > 0)
@@ -148,8 +148,10 @@
                                                     <option value="">Select shipping </option>
                                                     @foreach (Helper::shipping() as $shipping)
                                                         <option value="{{ $shipping->id }}" class="shippingOption"
-                                                            data-price="{{ $shipping->price }}" data-time="{{ $shipping->estimate_time ?? ''	 }}">{{ $shipping->type }}:
-                                                            ${{ $shipping->price }}</option>
+                                                            data-price="{{ $shipping->price }}"
+                                                            data-time="{{ $shipping->estimate_time ?? '' }}">
+                                                            {{ $shipping->type }}:
+                                                            {{ convertCurrency($shipping->price) }}</option>
                                                     @endforeach
                                                 </select>
                                             @else
@@ -162,7 +164,8 @@
 
                                         @if (session('coupon'))
                                             <li class="coupon_price" data-price="{{ session('coupon')['value'] }}">You
-                                                Save<span>${{ number_format(session('coupon')['value'], 2) }}</span></li>
+                                                Save<span>{{ convertCurrency(number_format(session('coupon')['value'], 2)) }}</span>
+                                            </li>
                                         @endif
                                         @php
                                             $total_amount = Helper::totalCartPrice();
@@ -172,10 +175,12 @@
                                         @endphp
                                         @if (session('coupon'))
                                             <li class="last" id="order_total_price">
-                                                Total<span>${{ number_format($total_amount, 2) }}</span></li>
+                                                Total<span>{{ convertCurrency(number_format($total_amount, 2)) }}</span>
+                                            </li>
                                         @else
                                             <li class="last" id="order_total_price">
-                                                Total<span>${{ number_format($total_amount, 2) }}</span></li>
+                                                Total<span>{{ convertCurrency(number_format($total_amount, 2)) }}</span>
+                                            </li>
                                         @endif
                                     </ul>
                                 </div>
@@ -214,7 +219,7 @@
                                         </form>
                                     </div>
 
-                                    
+
                                 </div>
                             </div>
                             <!--/ End Order Widget -->
@@ -251,7 +256,7 @@
                     <div class="single-service">
                         <i class="ti-rocket"></i>
                         <h4>Free shiping</h4>
-                        <p>Orders over $100</p>
+                        <p>Orders over {{ convertCurrency(100) }}</p>
                     </div>
                     <!-- End Single Service -->
                 </div>
@@ -428,9 +433,10 @@
         }
     </script>
     <script>
+        var publishable_key = "{{ setting('publishable_key') }}";
         var stripe = Stripe(
-            'pk_test_51LeviEEKjRrlgJDgpkEqpLqbqC9O9ql3rYXxyXyOKHv4ciXiM5mIDRC27BynBVfmqDtKdFoYDrsFjOfoxIZlLMDM00NC1XWz6g'
-            );
+            publishable_key
+        );
         var elements = stripe.elements();
 
         var card = elements.create('card', {
@@ -476,14 +482,14 @@
                             setTimeout(() => {
                                 window.location.href = "{{ route('user.order.index') }}";
                             }, 1000);
-                        }else{
+                        } else {
                             toastr.error(data.message);
                         }
                     },
-                    error: function(e){
+                    error: function(e) {
                         toastr.error("could't charge your card due to some unknown reasons, please try again");
                     },
-                    complete: function(){
+                    complete: function() {
                         $('.loading').hide();
                         $('.checkout-now').prop('disabled', false);
                     }
@@ -577,14 +583,37 @@
 
         $(document).ready(function() {
             $('.shipping select[name=shipping]').change(function() {
+                $('.loading').show();
                 let cost = parseFloat($(this).find('option:selected').data('price')) || 0;
                 let subtotal = parseFloat($('.order_subtotal').data('price'));
                 let coupon = parseFloat($('.coupon_price').data('price')) || 0;
                 let est_time = $(this).find('option:selected').data('time');
-                console.log(est_time);
+
                 // alert(coupon);
-                $('#order_total_price span').text('$' + (subtotal + cost - coupon).toFixed(2));
-                $('#shipping_time').html(est_time);
+                let totalll = subtotal + cost - coupon;
+
+
+                //ajax get request 
+                $.ajax({
+                    url: "{{ route('convert_currency') }}/"+totalll,
+                    type: "GET",
+                    data: {
+                        currency: 0,
+                    },
+                    success: function(data) {
+                        $('#order_total_price span').text(data);
+                        $('#shipping_time').html(est_time);
+                    },
+                    error: function(e) {
+
+                    },
+                    complete: function() {
+                        $('.loading').hide();
+                        $('.checkout-now').prop('disabled', false);
+                    }
+                });
+
+
             });
 
             var paypable = $('#order_total_price span').text();
@@ -608,11 +637,7 @@
                     $(this).prop('checked', false);
                     return false;
                 }
-
             })
-
-
-
         });
     </script>
 @endpush

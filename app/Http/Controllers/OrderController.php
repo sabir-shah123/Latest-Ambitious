@@ -45,6 +45,7 @@ class OrderController extends Controller
     public function store(Request $request)
     {
 
+
         $this->validate($request, [
             'first_name' => 'string|required',
             'last_name' => 'string|required',
@@ -60,6 +61,8 @@ class OrderController extends Controller
         ]);
 
 
+
+
         if (empty(Cart::where('user_id', auth()->user()->id)->where('order_id', null)->first())) {
             request()->session()->flash('error', 'Cart is Empty !');
             return back();
@@ -67,8 +70,11 @@ class OrderController extends Controller
 
         //order calculations
 
-        $order_data = $request->all();
+
+
+        $order_data = $request->except('_token', 'stripe_token');
         $order_data['order_number'] = 'ORD-' . strtoupper(Str::random(10));
+        $order_data['address2'] = $request->address2 ?? 'N/A';
         if (checkOrderNumber($order_data['order_number'])) {
             $order_data['order_number'] = 'ORD-' . strtoupper(Str::random(10));
         }
@@ -96,7 +102,6 @@ class OrderController extends Controller
             }
         }
 
-
         $request['total_amount'] = $order_data['total_amount'];
         //order creation
         $order_data['status'] = "new";
@@ -113,6 +118,7 @@ class OrderController extends Controller
 
         $order_data['uuid'] = Str::uuid()->toString();
         $order_data['payment_method'] = $request->payment_method;
+        // dd($order_data);
         $order = new Order();
         $order->fill($order_data);
         $status = $order->save();
@@ -125,7 +131,9 @@ class OrderController extends Controller
             ];
             Notification::send($users, new StatusNotification($details));
         }
-       
+
+
+
         session()->forget('cart');
         session()->forget('coupon');
         // }
@@ -245,7 +253,7 @@ class OrderController extends Controller
         // return $order;
         $file_name = $order->order_number . '-' . $order->first_name . '.pdf';
         $pdf = PDF::loadView('backend.order.pdf', compact('order'));
-       
+
         return $pdf->download($file_name);
     }
     // Income chart

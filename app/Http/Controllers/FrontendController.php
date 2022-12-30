@@ -441,8 +441,15 @@ class FrontendController extends Controller
     }
 
 
-    public function termsAndConditions()
+public function termsAndConditions()
     {
         return view('frontend.pages.term');
+    }
+
+    public function convertCurrency($curreny)
+    {
+        $curreny = $curreny;
+        $curreny = convertCurrency($curreny);
+        return response()->json($curreny);
     }
 }

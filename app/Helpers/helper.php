@@ -50,8 +50,7 @@ function chargeStripe($request)
         return response()->json(false);
     }
 
-    $secret = 'sk_test_51LeviEEKjRrlgJDgs68PdeTz89ECOBBcWazTJeBRVyDUWgmxizRfp3lHa6gdJs67A6QbkIP75B5seIQT3ubBES0700qclkWRVe';
-
+    $secret = setting('secret_key');
     $stripe = new \Stripe\StripeClient($secret);
 
     // First check customer is exsist or not
@@ -87,8 +86,8 @@ function chargeStripe($request)
     }
 
     $charge = $stripe->charges->create([
-        'amount' => $amount * 100, //20*100
-        'currency' => 'usd',
+        'amount' => $amount * 100,
+        'currency' => setting('currency_code', 1, 'usd'),
         'customer' => $customer->id,
         'description' => 'Payment for order',
     ]);
@@ -231,15 +230,28 @@ function getVisitorDetails($ip = NULL, $purpose = "location", $deep_detect = TRU
 
 function convertCurrency($amount = 0)
 {
-
     $details = getVisitorDetails();
     $to_Currency = 'usd';
+    $to_symbol = '$';
     if ($details && isset($details['currency_code'])) {
         $to_Currency = strtolower($details['currency_code']);
+        $to_symbol = $details['currency_symbol'];
     }
 
-    $from_Currency = setting('currency_code', 1, 'usd');
 
+    if (session('fromCurrency')) {
+        $from_Currency = session('fromCurrency');
+    } else {
+        $from_Currency = setting('currency_code', 1, 'usd');
+        session()->put('fromCurrency', $from_Currency);
+    }
+
+    if (session('currency_symbol')) {
+        $currency_symbol = session('currency_symbol');
+    } else {
+        $currency_symbol = setting('currency_symbol', 1, '$');
+        session()->put('currency_symbol', $currency_symbol);
+    }
 
     $amount = urlencode($amount);
     $from_Currency = urlencode($from_Currency);
@@ -256,8 +268,8 @@ function convertCurrency($amount = 0)
     $res = http_call('https://fcsapi.com/converter/converter_total_val', 'POST', $options);
 
     if (is_null($res)) {
-        return  ucwords($from_Currency) . '  ' . $amount;
+        return    $currency_symbol . ' ' . $amount;
     } else {
-        return ucwords($to_Currency) . '  ' . $res;
+        return  $to_symbol . ' ' . $res;
     }
 }

@@ -96,6 +96,45 @@
         </div>
     </div>
 
+    {{-- payments --}}
+    <div class="card">
+        <div class="row mt-4">
+            <div class="col-md-12 mx-auto">
+                <div class="card">
+                    <h5 class="card-header"> Stripe Payment Connection </h5>
+                    <div class="card-body">
+                        @php
+                            $pays = ['publishable_key', 'secret_key'];
+                        @endphp
+                        <form method="post" action="{{ route('setting.save') }}" enctype="multipart/form-data">
+                            @csrf
+                            @foreach ($pays as $pay)
+                                <div class="form-group">
+                                    <label for="short_des"
+                                        class="col-form-label">{{ ucfirst(str_replace('_', ' ', $pay)) }}
+                                        <span class="text-danger"></span></label>
+                                    <input type="text" class="form-control" name="{{ $pay }}"
+                                        value="{{ setting($pay, auth()->id(), '') }}"
+                                        placeholder="xxxxxxxxxx">
+                                    @error($pay)
+                                        <span class="text-danger">{{ $message }}</span>
+                                    @enderror
+                                </div>
+                            @endforeach
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12 text-right p-4">
+                            <input type="submit" class="btn btn-primary " value="Save Keys" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
     <div class="card">
         <div class="row mt-4">
             <div class="col-md-12 mx-auto">

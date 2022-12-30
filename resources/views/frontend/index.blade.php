@@ -3,8 +3,6 @@
 
 @section('main-content')
     <!-- Slider Area -->
-    
-    {{ dd(convertCurrency())  }}
     @if (count($banners) > 0)
         <section id="Gslider" class="carousel slide" data-ride="carousel">
             <ol class="carousel-indicators">
@@ -187,17 +185,17 @@
     <section class="midium-banner">
         <div class="container">
             <div class="row">
-   
+
                 @if ($featured)
                     @foreach ($featured as $data)
-                  
                         <!-- Single Banner  -->
                         <div class="col-lg-6 col-md-6 col-12">
                             <div class="single-banner" style="">
                                 @php
                                     $photo = explode(',', $data->photo);
                                 @endphp
-                                <img src="{{ asset($data->photo ?? '') }}" alt="{{ $data->photo ?? ''}}" style="height:360px;">
+                                <img src="{{ asset($data->photo ?? '') }}" alt="{{ $data->photo ?? '' }}"
+                                    style="height:360px;">
                                 <div class="content">
                                     <p>{{ $data->cat_info['title'] ?? 'Other' }}</p>
                                     <h3>{{ $data->title ?? '' }} <br>Up to<span> {{ $data->discount ?? 0 }}%</span></h3>
@@ -616,7 +614,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"></script>
     <script>
         /*==================================================================
-                    [ Isotope ]*/
+                                [ Isotope ]*/
         var $topeContainer = $('.isotope-grid');
         var $filter = $('.filter-tope-group');
 

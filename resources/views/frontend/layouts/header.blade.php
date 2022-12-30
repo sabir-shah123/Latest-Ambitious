@@ -1,5 +1,6 @@
 <header class="header shop">
     <!-- Topbar -->
+
     <div class="topbar">
         <div class="container">
             <div class="row">
@@ -8,18 +9,17 @@
                     <div class="top-left">
                         <ul class="list-main">
                             @php
-                                $settings = DB::table('settings')->get();
-                                
+                                $data = DB::table('settings')->first();
                             @endphp
                             <li><i class="ti-headphone-alt"></i>
-                                @foreach ($settings as $data)
-                                    {{ $data->phone }}
-                                @endforeach
+
+                                {{ $data->phone }}
+
                             </li>
                             <li><i class="ti-email"></i>
-                                @foreach ($settings as $data)
-                                    {{ $data->email }}
-                                @endforeach
+
+                                {{ $data->email }}
+
                             </li>
                         </ul>
                     </div>
@@ -59,12 +59,8 @@
                 <div class="col-lg-2 col-md-2 col-12">
                     <!-- Logo -->
                     <div class="logo">
-                        @php
-                            $settings = DB::table('settings')->get();
-                        @endphp
-                        <a href="{{ route('home') }}"><img
-                                src="@foreach ($settings as $data) {{ asset($data->logo) }} @endforeach"
-                                alt="logo"></a>
+
+                        <a href="{{ route('home') }}"><img src=" {{ asset($data->logo ?? '') }} " alt="logo"></a>
                     </div>
                     <!--/ End Logo -->
                     <!-- Search Form -->
@@ -138,7 +134,8 @@
                                                 <h4><a href="{{ route('product-detail', $data->product['slug']) }}"
                                                         target="_blank">{{ $data->product['title'] }}</a></h4>
                                                 <p class="quantity">{{ $data->quantity }} x - <span
-                                                        class="amount">{{ number_format($data->price, 2) }}</span></p>
+                                                        class="amount">{{ convertCurrency(number_format($data->price, 2)) }}</span>
+                                                </p>
                                             </li>
                                         @endforeach
                                     </ul>
@@ -181,7 +178,8 @@
                                                 <h4><a href="{{ route('product-detail', $data->product['slug']) }}"
                                                         target="_blank">{{ $data->product['title'] }}</a></h4>
                                                 <p class="quantity">{{ $data->quantity }} x - <span
-                                                        class="amount">${{ number_format($data->price, 2) }}</span></p>
+                                                        class="amount">{{ convertCurrency(number_format($data->price, 2)) }}</span>
+                                                </p>
                                             </li>
                                         @endforeach
                                     </ul>
@@ -189,7 +187,7 @@
                                         <div class="total">
                                             <span>Total</span>
                                             <span
-                                                class="total-amount">${{ number_format(Helper::totalCartPrice(), 2) }}</span>
+                                                class="total-amount">{{ convertCurrency(number_format(Helper::totalCartPrice(), 2)) }}</span>
                                         </div>
                                         <a href="{{ route('checkout') }}" class="btn animate">Checkout</a>
                                     </div>

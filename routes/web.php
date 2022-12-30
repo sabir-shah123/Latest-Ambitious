@@ -52,6 +52,7 @@ Route::get('/cart',function(){
     return view('frontend.pages.cart');
 })->name('cart');
 Route::get('/checkout','CartController@checkout')->name('checkout')->middleware('user');
+Route::get('/convert_currency/{currency?}','FrontendController@convertCurrency')->name('convert_currency');
 // Wishlist
 Route::get('/wishlist',function(){
     return view('frontend.pages.wishlist');
