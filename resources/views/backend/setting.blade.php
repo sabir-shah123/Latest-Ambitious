@@ -6,8 +6,6 @@
         <div class="card-body">
             <form method="post" action="{{ route('settings.update') }}" enctype="multipart/form-data">
                 @csrf
-                {{-- @method('PATCH') --}}
-                {{-- {{dd($data)}} --}}
                 <div class="form-group">
                     <label for="company_name" class="col-form-label">Company Name <span class="text-danger">*</span></label>
                     <input type="text" class="form-control" name="company_name" required

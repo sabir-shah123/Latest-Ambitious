@@ -7,16 +7,16 @@
 				<div class="row">
 					<div class="col-lg-5 col-md-6 col-12">
 						@php
-								$settings=DB::table('settings')->get();
+								$settings=DB::table('settings')->first();
 							@endphp
 						<!-- Single Widget -->
 						<div class="single-footer about">
 							<div class="logo">
-								<a href="{{ url('/') }}"><img src="@foreach($settings as $data) {{ asset($data->logo) }} @endforeach" alt="#"></a>
+								<a href="{{ url('/') }}"><img src="{{ asset($settings->logo ?? '') }}" alt="#"></a>
 							</div>
 							
-							<p class="text">@foreach($settings as $data) {{$data->short_des}} @endforeach</p>
-							<p class="call">Got Question? Call us 24/7<span><a href="tel: {{ $data->phone}}">@foreach($settings as $data) {{$data->phone}} @endforeach</a></span></p>
+							<p class="text">{!! $settings->short_des ?? '' !!}</p>
+							<p class="call">Got Question? Call us 24/7<span><a href="tel: {{  $settings->phone ?? '' }}">{{ $settings->phone ?? '' }}</a></span></p>
 						</div>
 						<!-- End Single Widget -->
 					</div>
@@ -26,10 +26,10 @@
 							<h4>Information</h4>
 							<ul>
 								<li><a href="{{route('about-us')}}">About Us</a></li>
-								<li><a href="#">Faq</a></li>
-								<li><a href="#">Terms & Conditions</a></li>
+								{{-- <li><a href="#">Faq</a></li> --}}
+								<li><a href="{{ route('terms.show') }}">Terms & Conditions</a></li>
 								<li><a href="{{route('contact')}}">Contact Us</a></li>
-								<li><a href="#">Help</a></li>
+								{{-- <li><a href="#">Help</a></li> --}}
 							</ul>
 						</div>
 						<!-- End Single Widget -->
@@ -55,9 +55,9 @@
 							<!-- Single Widget -->
 							<div class="contact">
 								<ul>
-									<li>@foreach($settings as $data) {{$data->address}} @endforeach</li>
-									<li>@foreach($settings as $data) {{$data->email}} @endforeach</li>
-									<li>@foreach($settings as $data) {{$data->phone}} @endforeach</li>
+									<li>{{ $settings->address ??'' }}</li>
+									<li>{{ $settings->email ?? '' }}</li>
+									<li>{{ $settings->address ?? ''}}</li>
 								</ul>
 							</div>
 							<!-- End Single Widget -->

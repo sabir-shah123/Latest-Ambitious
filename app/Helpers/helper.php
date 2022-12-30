@@ -55,14 +55,18 @@ function chargeStripe($request)
     $stripe = new \Stripe\StripeClient($secret);
 
     // First check customer is exsist or not
+
     $customers = $stripe->customers->search([
         'query' => 'email:\'' . $request->email . '\'',
     ]);
+
+   
 
     $customer = null;
     foreach ($customers->data as $cust) {
         $customer = $cust;
     }
+    
 
     $amount = $request->total_amount ?? 0;
     if ($customer == null) {
@@ -77,7 +81,7 @@ function chargeStripe($request)
         $stripe->customers->update(
             $customer->id,
             [
-                'source' => $request->token,
+                'source' => $request->stripe_token,
             ]
         );
     }
@@ -86,7 +90,7 @@ function chargeStripe($request)
         'amount' => $amount * 100, //20*100
         'currency' => 'usd',
         'customer' => $customer->id,
-        'description' => 'Recent paid with customer scenrio',
+        'description' => 'Payment for order',
     ]);
 
     if ($charge->captured) {

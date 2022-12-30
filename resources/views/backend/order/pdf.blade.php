@@ -69,37 +69,41 @@
     padding: .30rem;
   }
 </style>
+@php
+  $setting = App\Models\Settings::first();
+
+@endphp
   <div class="invoice-header">
     <div class="float-left site-logo">
-      <img src="{{asset('backend/img/logo.png')}}" alt="">
+      <img src="{{ public_path($setting->logo ?? '') }}" alt="" height="80" width="80">
     </div>
     <div class="float-right site-address">
-      <h4>{{env('APP_NAME')}}</h4>
-      <p>{{env('APP_ADDRESS')}}</p>
-      <p>Phone: <a href="tel:{{env('APP_PHONE')}}">{{env('APP_PHONE')}}</a></p>
-      <p>Email: <a href="mailto:{{env('APP_EMAIL')}}">{{env('APP_EMAIL')}}</a></p>
+      <h4> Company Information </h4>
+      <p>{{ $setting->company_name ?? '' }}</p>
+      <p>Phone: <a href="tel:{{ $setting->phone ??'' }}">{{ $setting->phone ??'' }}</a></p>
+      <p>Email: <a href="mailto:{{ $setting->email ??'' }}">{{ $setting->email ??'' }}</a></p>
     </div>
     <div class="clearfix"></div>
   </div>
   <div class="invoice-description">
     <div class="invoice-left-top float-left">
-      <h6>Invoice to</h6>
-       <h3>{{$order->first_name}} {{$order->last_name}}</h3>
-       <div class="address">
+      <h6>Invoice to : </h6>
+       <h3>{{ $order->first_name ?? auth()->user()->name ?? '' }} </h3>
+       <div class="address"> 
         <p>
           <strong>Country: </strong>
-          {{$order->country}}
+          {{ $order->country ?? '' }}
         </p>
         <p>
           <strong>Address: </strong>
-          {{ $order->address1 }} OR {{ $order->address2}}
+          {{ $order->address1 ?? '' }} OR {{ $order->address2 ?? ''}}
         </p>
-         <p><strong>Phone:</strong> {{ $order->phone }}</p>
-         <p><strong>Email:</strong> {{ $order->email }}</p>
+         <p><strong>Phone:</strong> {{ $order->phone ?? '' }}</p>
+         <p><strong>Email:</strong> {{ $order->email ?? '' }}</p>
        </div>
     </div>
     <div class="invoice-right-top float-right" class="text-right">
-      <h3>Invoice #{{$order->order_number}}</h3>
+      <h3>Invoice #{{$order->order_number ?? ''}}</h3>
       <p>{{ $order->created_at->format('D d m Y') }}</p>
       {{-- <img class="img-responsive" src="data:image/png;base64, {{ base64_encode(QrCode::format('png')->size(150)->generate(route('admin.product.order.show', $order->id )))}}"> --}}
     </div>
@@ -125,11 +129,11 @@
         <tr>
           <td><span>
               @foreach($product as $pro)
-                {{$pro->title}}
+                {{ $pro->title ?? '' }}
               @endforeach
             </span></td>
-          <td>x{{$cart->quantity}}</td>
-          <td><span>{{ currency_sym() }}{{number_format($cart->price,2)}}</span></td>
+          <td>x{{$cart->quantity ?? ''}}</td>
+          <td><span>{{ currency_sym() }} {{ number_format($cart->price,2) }}</span></td>
         </tr>
       @endforeach
       </tbody>
@@ -137,7 +141,7 @@
         <tr>
           <th scope="col" class="empty"></th>
           <th scope="col" class="text-right">Subtotal:</th>
-          <th scope="col"> <span>${{number_format($order->sub_total,2)}}</span></th>
+          <th scope="col"> <span>{{ currency_sym() }} {{ number_format($order->sub_total,2) }}</span></th>
         </tr>
       {{-- @if(!empty($order->coupon))
         <tr>
@@ -152,14 +156,14 @@
             $shipping_charge=DB::table('shippings')->where('id',$order->shipping_id)->pluck('price');
           @endphp
           <th scope="col" class="text-right ">Shipping:</th>
-          <th><span>${{number_format($shipping_charge[0] ?? 0,2)}}</span></th>
+          <th><span>{{ currency_sym() }} {{ number_format($shipping_charge[0] ?? 0,2) }}</span></th>
         </tr>
         <tr>
           <th scope="col" class="empty"></th>
           <th scope="col" class="text-right">Total:</th>
           <th>
             <span>
-                ${{number_format($order->total_amount,2)}}
+              {{ currency_sym() }} {{ number_format($order->total_amount,2) }}
             </span>
           </th>
         </tr>

@@ -11,7 +11,6 @@ use Notification;
 use Helper;
 use Illuminate\Support\Str;
 use App\Notifications\StatusNotification;
-use Dompdf\Dompdf;
 use PDF;
 
 class OrderController extends Controller
@@ -229,22 +228,9 @@ class OrderController extends Controller
         // return $request->all();
         $order = Order::where('user_id', auth()->user()->id)->where('order_number', $request->order_number)->first();
         if ($order) {
-            if ($order->status == "new") {
-                request()->session()->flash('success', 'Your order has been placed. please wait.');
-                return redirect()->route('home');
-            } elseif ($order->status == "process") {
-                request()->session()->flash('success', 'Your order is under processing please wait.');
-                return redirect()->route('home');
-            } elseif ($order->status == "delivered") {
-                request()->session()->flash('success', 'Your order is successfully delivered.');
-                return redirect()->route('home');
-            } else {
-                request()->session()->flash('error', 'Your order canceled. please try again');
-                return redirect()->route('home');
-            }
+            return view('frontend.pages.track-result', compact('order'));
         } else {
-            request()->session()->flash('error', 'Invalid order numer please try again');
-            return back();
+            return back()->with('error', 'Order not found');
         }
     }
 
@@ -254,9 +240,8 @@ class OrderController extends Controller
         $order = Order::getAllOrder($request->id);
         // return $order;
         $file_name = $order->order_number . '-' . $order->first_name . '.pdf';
-        $pdf = PDF::loadView('backend.order.pdf', ['order' => $order]);
-        $pdfContent = $pdf->output();
-        //download
+        $pdf = PDF::loadView('backend.order.pdf', compact('order'));
+       
         return $pdf->download($file_name);
     }
     // Income chart
